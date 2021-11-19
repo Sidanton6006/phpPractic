@@ -8,7 +8,7 @@
     <title>Новини</title>
 </head>
 <?php
-$conn = new PDO("mysql:host=localhost;dbname=mylocal", "root", "");
+$conn = new PDO("mysql:host=localhost;dbname=myLocal", "root", "");
 $reader = $conn->query("SELECT * FROM news");
 
 ?>
@@ -24,6 +24,7 @@ $reader = $conn->query("SELECT * FROM news");
             <th scope="col">Name</th>
             <th scope="col">Description</th>
             <th scope="col">Image</th>
+            <th scope="col">Action</th>
         </tr>
         </thead>
         <tbody>
@@ -35,8 +36,12 @@ $reader = $conn->query("SELECT * FROM news");
             <td>{$row['Name']}</td>
             <td>{$row['Description']}</td>
             <td>
-                <img src='/images/{$row['Image']}' alt='{$row['Image']}' width='100'/>
+                <img src='/images/{$row['Image']}' id='imgField' alt='Bear' width='100'/>
                 
+            </td>
+            
+            <td>
+               <a class='btn btn-danger btnDeleteCheck' data-id='{$row['Id']}' data-toggle='modal' data-target='#text'>Delete</a>
             </td>
         </tr>
         ";
@@ -46,6 +51,58 @@ $reader = $conn->query("SELECT * FROM news");
     </table>
 </div>
 
+<div class="modal" id="text" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Deleting</h5>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure to delete news with id: <span id="newsId">asd</span></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="btnDelete" data-dismiss="modal">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/axios.min.js"></script>
+<script src="/js/jquery.min.js"></script>
+<script src="/js/bootstrap.min.js"></script>
+<script>
+    var id = 0;
+    var imgPath = '';
+
+    window.addEventListener("load",function() {
+        var list=document.querySelectorAll(".btnDeleteCheck");
+        for (let i=0; i<list.length; i++)
+        {
+            list[i].addEventListener("click", function(e) {
+                id = e.currentTarget.dataset.id;
+                console.log(e.currentTarget);
+
+                document.getElementById('newsId').innerText = id;
+
+                document.getElementById('btnDelete').addEventListener('click', function(){
+                    const data = new FormData();
+                    data.append("id", id);
+                    data.append("imgPath", imgPath);
+                    axios.post("/delete.php", data)
+                        .then(resp => {
+                            console.log(resp);
+                        });
+                    location.reload();
+                })
+            });
+
+        }
+
+
+    });
+</script>
 </body>
 </html>

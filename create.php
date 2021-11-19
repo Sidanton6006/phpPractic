@@ -1,22 +1,17 @@
 <?php
-if($_SERVER["REQUEST_METHOD"]=="POST") {
-    $uploaddir = $_SERVER['DOCUMENT_ROOT'].'/images/';
-    $file_name = uniqid('300_').'.jpg';
-    $file_save_path = $uploaddir.$file_name;
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+//    echo "<h2>name = ".$_POST['name']."</h2>";
 
-    if (move_uploaded_file($_FILES['image']['tmp_name'], $file_save_path)) {
-        echo "Файл корректен и был успешно загружен.\n";
-    } else {
-        echo "Возможная атака с помощью файловой загрузки!\n";
-    }
+    $filename = uniqid().'.jpg';
+    $filesavepath=$_SERVER['DOCUMENT_ROOT'].'/images/'.$filename;
+    move_uploaded_file($_FILES['image']['tmp_name'],$filesavepath);
 
-    $name=$_POST['name'];
-    $description=$_POST['description'];
-    $image=$_POST['image'];
+    $name = $_POST['name'];
+    $description = $_POST['description'];
 
-    $conn = new PDO("mysql:host=localhost;dbname=mylocal", "root", "");
-    $sql = "INSERT INTO `news` (`Name`, `Description`,`Image`) VALUES (?, ?, ?);";
-    $conn->prepare($sql)->execute([$name,$description,$image]);
+    $conn = new PDO("mysql:host=localhost;dbname=myLocal", "root", "");
+    $sql = "INSERT INTO `news` (`name`, `description`,`image`) VALUES (?, ?, ?);";
+    $conn->prepare($sql)->execute([$name, $description, $filename]);
     header("Location: /");
     exit();
 }
@@ -41,44 +36,42 @@ if($_SERVER["REQUEST_METHOD"]=="POST") {
 
 <div class="container">
     <h1>Додати новину</h1>
-    <form method="post">
-        <div class="mb-3"">
+    <form method="post" enctype="multipart/form-data">
+        <div class="mb-3">
             <label for="name" class="form-label">Назва</label>
             <input type="text" class="form-control" id="name" name="name" placeholder="Enter name">
         </div>
         <div class="mb-3" class="form-label">
             <label for="description">Опис</label>
-            <div id="editor">
-            </div>
-            <input type="hidden" class="form-control" id="description" name="description"></input>
+            <textarea class="form-control" rows="10" cols="35" id="description" name="description"
+                      placeholder="Enter email"></textarea>
         </div>
-        <div class="mb-3" class="form-label">
-            <label for="image">Фото</label>
-            <input type="file" class="form-control" id="image" name="image" placeholder="Enter image">
+        <div class="mb-3">
+            <label for="image" class="form-label">
+                <img src="https://www.pngall.com/wp-content/uploads/2/Upload-Transparent.png"
+                     width="150"
+                     id="img_preview"
+                     style="cursor: pointer"
+                />
+            </label>
+            <input type="file" name="image" id="image" class="form-control d-none"/>
         </div>
-        <button type="submit" class="btn btn-primary" id="myBtn">Зберегти</button>
+        <button type="submit" class="btn btn-primary">Зберегти</button>
     </form>
 
 </div>
 
 
 <script src="/js/bootstrap.bundle.min.js"></script>
-<script src="/js/ckeditor.js"></script>
+
 <script>
-    let myEditor;
-    ClassicEditor
-        .create( document.querySelector( '#editor' ) )
-        .then( editor => {
-            console.log( editor );
-            myEditor = editor;
-        } )
-        .catch( error => {
-            console.error( error );
-        } );
-    document.getElementById('myBtn').addEventListener('click',SaveDataFromEditor);
-    function SaveDataFromEditor(){
-        document.getElementById('description').value = myEditor.getData();
-    }
+    window.addEventListener('load',function() {
+        const file = document.getElementById('image');
+        file.addEventListener("change", function(e) {
+            const uploadFile = e.currentTarget.files[0];
+            document.getElementById("img_preview").src=URL.createObjectURL(uploadFile);
+        });
+    });
 </script>
 </body>
 </html>
