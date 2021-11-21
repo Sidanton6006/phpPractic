@@ -7,7 +7,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     move_uploaded_file($_FILES['image']['tmp_name'],$filesavepath);
 
     $name = $_POST['name'];
-    $description = $_POST['description'];
+    $description = $_POST['content'];
 
     $conn = new PDO("mysql:host=localhost;dbname=myLocal", "root", "");
     $sql = "INSERT INTO `news` (`name`, `description`,`image`) VALUES (?, ?, ?);";
@@ -27,9 +27,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="/css/bootstrap.min.css">
     <title>Додати новину</title>
 </head>
-<?php
-
-?>
 <body>
 
 <?php include "navbar.php"; ?>
@@ -39,12 +36,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <form method="post" enctype="multipart/form-data">
         <div class="mb-3">
             <label for="name" class="form-label">Назва</label>
-            <input type="text" class="form-control" id="name" name="name" placeholder="Enter name">
+            <input type="text" class="form-control" id="name" name="name">
         </div>
-        <div class="mb-3" class="form-label">
+        <div class="mb-3">
             <label for="description">Опис</label>
-            <textarea class="form-control" rows="10" cols="35" id="description" name="description"
-                      placeholder="Enter email"></textarea>
+            <textarea class="form-control" id="editor" name="content"></textarea>
         </div>
         <div class="mb-3">
             <label for="image" class="form-label">
@@ -63,8 +59,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 
 <script src="/js/bootstrap.bundle.min.js"></script>
+<script src="/js/ckeditor.js"></script>
 
 <script>
+    ClassicEditor
+        .create( document.querySelector( '#editor' ) )
+        .catch( error => {
+            console.error( error );
+        } );
+    
     window.addEventListener('load',function() {
         const file = document.getElementById('image');
         file.addEventListener("change", function(e) {

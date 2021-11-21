@@ -69,16 +69,15 @@ $reader = $conn->query("SELECT * FROM news");
     </div>
 </div>
 
-<script src="/js/bootstrap.bundle.min.js"></script>
 <script src="/js/axios.min.js"></script>
 <script src="/js/jquery.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
 <script>
-    var id = 0;
-    var imgPath = '';
+    let id = 0;
+    let imgPath = '';
 
     window.addEventListener("load",function() {
-        var list=document.querySelectorAll(".btnDeleteCheck");
+        let list=document.querySelectorAll(".btnDeleteCheck");
         for (let i=0; i<list.length; i++)
         {
             list[i].addEventListener("click", function(e) {
