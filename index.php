@@ -41,7 +41,8 @@ $reader = $conn->query("SELECT * FROM news");
             </td>
             
             <td>
-               <a class='btn btn-danger btnDeleteCheck' data-id='{$row['Id']}' data-toggle='modal' data-target='#text'>Delete</a>
+               <a class='btn btn-warning btnEditCheck' data-id='{$row['Id']}' data-toggle='modal' data-target='#editNews'>Edit</a>
+               <a class='btn btn-danger btnDeleteCheck' data-id='{$row['Id']}' data-toggle='modal' data-target='#deleteNews'>Delete</a>
             </td>
         </tr>
         ";
@@ -51,7 +52,7 @@ $reader = $conn->query("SELECT * FROM news");
     </table>
 </div>
 
-<div class="modal" id="text" tabindex="-1" role="dialog">
+<div class="modal" id="deleteNews" tabindex="-1" role="dialog">
     <div class="modal-dialog" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -69,12 +70,50 @@ $reader = $conn->query("SELECT * FROM news");
     </div>
 </div>
 
+<div class="modal" id="editNews" tabindex="-1" role="dialog">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Editing news with id: </h5>
+                <button type="button" class="btn-close" data-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form>
+                    <div class="form-group">
+                        <label for="recipient-name" class="col-form-label">Name:</label>
+                        <input type="text" class="form-control" id="recipient-name">
+                    </div>
+                    <div class="form-group">
+                        <label for="message-text" class="col-form-label">Description:</label>
+                        <textarea class="form-control" id="message-text"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="message-text" class="col-form-label">Description:</label>
+                        <textarea class="form-control" id="editor" name="content"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-warning" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-success" id="btnEdit">Edit</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 <script src="/js/axios.min.js"></script>
 <script src="/js/jquery.min.js"></script>
 <script src="/js/bootstrap.min.js"></script>
+<script src="/js/ckeditor.js"></script>
 <script>
     let id = 0;
     let imgPath = '';
+
+    ClassicEditor
+        .create( document.querySelector( '#editor' ) )
+        .catch( error => {
+            console.error( error );
+        } );
 
     window.addEventListener("load",function() {
         let list=document.querySelectorAll(".btnDeleteCheck");
@@ -100,7 +139,20 @@ $reader = $conn->query("SELECT * FROM news");
 
         }
 
+        let editButtons=document.querySelectorAll(".btnEditCheck");
+        for(let i=0; i<editButtons.length; i++){
+            list[i].addEventListener("click",function (e){
+                id = e.currentTarget.dataset.id;
 
+                document.getElementById('btnEdit')
+                const data = new FormData();
+                data.append("id", id);
+                axios.post("/edit.php", data)
+                    .then(resp => {
+                        console.log(resp);
+                    });
+            });
+        }
     });
 </script>
 </body>
